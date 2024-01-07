@@ -1,5 +1,4 @@
 #![no_std]
-#![feature(custom_test_frameworks)]
 #![feature(abi_x86_interrupt)]
 
 pub mod gdt;
