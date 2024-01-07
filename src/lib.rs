@@ -1,9 +1,13 @@
 #![no_std]
 #![feature(abi_x86_interrupt)]
 
+use crate::vga_buffer::init_timer;
+use x86_64::instructions::port::Port;
+
 pub mod gdt;
 pub mod interrupts;
 pub mod serial;
+pub mod snake_game;
 pub mod vga_buffer;
 
 pub fn init() {
@@ -11,6 +15,7 @@ pub fn init() {
     interrupts::init_idt();
     unsafe { interrupts::PICS.lock().initialize() };
     x86_64::instructions::interrupts::enable();
+    init_timer(19);
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -21,8 +26,6 @@ pub enum QemuExitCode {
 }
 
 pub fn exit_qemu(exit_code: QemuExitCode) {
-    use x86_64::instructions::port::Port;
-
     unsafe {
         let mut port = Port::new(0xf4);
         port.write(exit_code as u32);
